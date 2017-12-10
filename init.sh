@@ -8,7 +8,12 @@ sudo apt install -y neovim mosh zsh tmux python-dev python-pip python3-dev pytho
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-rm -rf ~/.vim ~/.vimrc ~/.zshrc ~/.tmux ~/.tmux.conf
+# rm -rf ~/.vim ~/.vimrc ~/.zshrc ~/.tmux ~/.tmux.conf
+
+mv ~/.vim ~/dotfiles_bak/vim
+mv ~/.vimrc ~/dotfiles_bak/vim
+mv ~/.zshrc ~/dotfiles_bak/zshrc
+mv ~/.tmux.conf ~/dotfiles_bak/tmux.conf
 
 mkdir -p ~/.config ~/.config/nvim
 ln -s ~/dotfiles/zshrc ~/.zshrc
