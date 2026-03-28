@@ -73,6 +73,9 @@ configure_desktop() {
     defaults write com.apple.dock show-recents -bool false
     defaults write com.apple.dock tilesize -int 36
 
+    # Disable Passwords app from AutoFill
+    defaults write com.apple.WebUI AutoFillPasswords -bool false
+
     killall Finder 2>/dev/null || true
     killall Dock 2>/dev/null || true
 
