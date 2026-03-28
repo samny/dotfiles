@@ -8,7 +8,7 @@ set -euo pipefail
 #   or:  git clone <repo> ~/dotfiles && cd ~/dotfiles && ./bootstrap.sh
 # =============================================================================
 
-DOTFILES_REPO="https://github.com/YOUR_USER/dotfiles.git"
+DOTFILES_REPO="https://github.com/samny/dotfiles.git"
 DOTFILES_DIR="$HOME/dotfiles"
 
 # Colors
@@ -67,6 +67,9 @@ configure_desktop() {
     defaults write com.apple.finder ShowPathbar -bool true
     defaults write com.apple.finder ShowStatusBar -bool true
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+    # Screen capture location
+    defaults write com.apple.screencapture location ~/Downloads/Screenshots
 
     # Dock: clear all apps, hide recents
     defaults write com.apple.dock persistent-apps -array
