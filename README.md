@@ -9,10 +9,10 @@ Cross-platform setup for macOS, Debian, and Fedora.
 
 ```bash
 # Option A: one-liner
-curl -fsSL https://raw.githubusercontent.com/YOUR_USER/dotfiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/samny/dotfiles/main/bootstrap.sh | bash
 
 # Option B: clone first
-git clone https://github.com/YOUR_USER/dotfiles.git ~/dotfiles
+git clone https://github.com/samny/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./bootstrap.sh
 ```
