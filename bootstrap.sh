@@ -247,9 +247,9 @@ main() {
   configure_desktop
   install_prerequisites
   setup_dotfiles
-  configure_shell
   install_homebrew
   install_packages
+  configure_shell
   # configure_devpod
 
   echo ""
