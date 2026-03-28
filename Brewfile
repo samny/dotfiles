@@ -15,6 +15,8 @@ brew "gh"
 brew "git-lfs"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
+brew "opencode"
+brew "copilot"
 
 # GUI apps
 cask "ghostty" if OS.mac?
