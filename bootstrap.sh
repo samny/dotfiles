@@ -258,9 +258,8 @@ main() {
   echo "  • Configure SSH hosts for DevPod: devpod provider update ssh"
   if [[ "$DISTRO" == "macos" ]]; then
     echo "  • Sign in to 1Password"
-    echo "  • Sign in to VS Code / Zed extensions"
   else
-    echo "  • Install GUI apps manually (1Password, VS Code, Zed, etc.)"
+    echo "  • Install GUI apps manually (1Password, VS Codium, Zed, etc.)"
   fi
   echo ""
 }
