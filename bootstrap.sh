@@ -246,11 +246,11 @@ main() {
 
   configure_desktop
   install_prerequisites
+  setup_dotfiles
+  configure_shell
   install_homebrew
   install_packages
-  setup_dotfiles
   # configure_devpod
-  configure_shell
 
   echo ""
   step "All done! Open a new terminal to load your config."
