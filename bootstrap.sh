@@ -249,7 +249,7 @@ main() {
   install_homebrew
   install_packages
   setup_dotfiles
-  configure_devpod
+  # configure_devpod
   configure_shell
 
   echo ""
