@@ -159,11 +159,6 @@ install_packages() {
 
   local brewfile="$DOTFILES_DIR/Brewfile"
 
-  # On Linux, use the CLI-only Brewfile (no casks)
-  if [[ "$DISTRO" != "macos" ]]; then
-    brewfile="$DOTFILES_DIR/Brewfile.linux"
-  fi
-
   brew bundle --file="$brewfile"
 
   info "All packages installed"
