@@ -22,15 +22,12 @@ cask "ghostty" if OS.mac?
 cask "github" if OS.mac?
 cask "1password" if OS.mac?
 cask "1password-cli" if OS.mac?
-cask "visual-studio-code" if OS.mac?
+cask "vscodium" if OS.mac?
 cask "zed" if OS.mac?
 cask "podman-desktop" if OS.mac?
 cask "devpod" if OS.mac?
 cask "font-fira-code-nerd-font" if OS.mac?
 cask "obsidian" if OS.mac?
-
-flatpak "com.onepassword.OnePassword" if OS.linux?
-
 
 # Mac App Store apps (uncomment and add IDs as needed)
 # mas "Xcode", id: 497799835
