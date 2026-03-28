@@ -31,7 +31,7 @@ link_file() {
 }
 
 # ── Zsh ──────────────────────────────────────────────────────────────────────
-link_file "$DOTFILES_DIR/zsh/.zshrc"       "$HOME/.config/.zshrc"
+link_file "$DOTFILES_DIR/zsh/.zshrc"       "$HOME/.config/zsh/.zshrc"
 link_file "$DOTFILES_DIR/zsh/.zshenv"      "$HOME/.zshenv"
 
 # ── Starship ─────────────────────────────────────────────────────────────────
