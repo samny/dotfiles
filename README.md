@@ -24,7 +24,7 @@ cd ~/dotfiles
 | Desktop defaults (list view, clean dock) | ✅ Finder + Dock | ✅ GNOME (Nautilus + Dash) |
 | Build tools | ✅ Xcode CLI | ✅ apt/dnf build-essential |
 | Homebrew | ✅ | ✅ Linuxbrew |
-| CLI tools (zsh, podman, starship, fnm, devpod) | ✅ via Brewfile | ✅ via Brewfile.linux |
+| CLI tools (zsh, podman, starship, fnm, devpod) | ✅ via Brewfile | ✅ via Brewfile |
 | GUI apps (Ghostty, 1Password, VS Code, Zed, …) | ✅ via casks | ❌ Manual |
 | Dotfiles symlinked | ✅ | ✅ |
 | DevPod providers (podman + ssh) | ✅ | ✅ |
