@@ -9,7 +9,6 @@ brew "podman"
 brew "podman-compose"
 brew "starship"
 brew "fnm"
-brew "devpod" if OS.mac?
 brew "tailscale"
 brew "wget"
 brew "gh"
