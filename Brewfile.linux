@@ -1,0 +1,12 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Brewfile.linux — CLI tools only (GUI apps installed manually on Linux)
+# Install: brew bundle --file=Brewfile.linux
+# ──────────────────────────────────────────────────────────────────────────────
+
+# CLI tools
+brew "zsh"
+brew "podman"
+brew "podman-compose"
+brew "starship"
+brew "fnm"
+brew "devpod"

@@ -1,0 +1,46 @@
+contexts:
+  default:
+    defaultIde: zed
+    defaultProvider: podman
+    providers:
+      devpods-remote:
+        creationTimestamp: "2026-03-17T13:06:48Z"
+        initialized: true
+        options:
+          AGENT_PATH:
+            userProvided: true
+            value: /usr/local/bin/devpod
+          DOCKER_PATH:
+            userProvided: true
+            value: /usr/bin/podman
+          EXTRA_FLAGS:
+            userProvided: true
+          HOST:
+            userProvided: true
+            value: developer@devpods
+          INACTIVITY_TIMEOUT:
+            userProvided: true
+          INJECT_DOCKER_CREDENTIALS:
+            userProvided: true
+            value: "true"
+          INJECT_GIT_CREDENTIALS:
+            userProvided: true
+            value: "true"
+          PORT:
+            userProvided: true
+            value: "22"
+          USE_BUILTIN_SSH:
+            userProvided: true
+            value: "false"
+        singleMachine: true
+      podman:
+        creationTimestamp: "2026-03-14T13:48:14Z"
+        initialized: true
+        options:
+          DOCKER_BUILDER: {}
+          DOCKER_HOST: {}
+          DOCKER_PATH:
+            userProvided: true
+            value: /opt/homebrew/bin/podman
+          INACTIVITY_TIMEOUT: {}
+defaultContext: default

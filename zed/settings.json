@@ -1,0 +1,48 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent_servers": {
+    "github-copilot-cli": {
+      "type": "registry",
+    },
+    "goose": {
+      "type": "registry",
+    },
+    "opencode": {
+      "type": "registry",
+    },
+  },
+  "agent": {
+    "default_profile": "write",
+    "default_model": {
+      "effort": "high",
+      "provider": "copilot_chat",
+      "model": "claude-sonnet-4.6",
+      "enable_thinking": true,
+    },
+    "favorite_models": [],
+    "model_parameters": [],
+  },
+  "context_servers": {
+    "mcp-server-github": {
+      "enabled": true,
+      "remote": false,
+      "settings": {},
+    },
+  },
+  "disable_ai": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "light",
+    "light": "macOS Classic Light",
+    "dark": "Ayu Mirage",
+  },
+  "title_bar": { "show_sign_in": false },
+}
