@@ -268,7 +268,6 @@ main() {
   echo ""
   step "All done! Open a new terminal to load your config."
   echo "  Remaining manual steps:"
-  echo "  • Configure SSH hosts for DevPod: devpod provider update ssh"
   if [[ "$DISTRO" == "macos" ]]; then
     echo "  • Sign in to 1Password"
   else
