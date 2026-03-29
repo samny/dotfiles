@@ -69,6 +69,7 @@ configure_desktop() {
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
     # Screen capture location
+    mkdir -p ~/Downloads/Screenshots
     defaults write com.apple.screencapture location ~/Downloads/Screenshots
 
     # Dock: clear all apps, hide recents
@@ -78,9 +79,13 @@ configure_desktop() {
 
     # Disable Passwords app from AutoFill
     defaults write com.apple.WebUI AutoFillPasswords -bool false
+    defaults write com.apple.Passwords autofillEnabled -bool false
+
 
     killall Finder 2>/dev/null || true
+    killall cfprefsd 2>/dev/null || true
     killall Dock 2>/dev/null || true
+    killall SystemUIServer 2>/dev/null || true
 
   elif command -v gsettings &>/dev/null; then
     # GNOME: Nautilus always list view
@@ -233,9 +238,10 @@ configure_shell() {
 }
 
 set_wallpaper() {
-  step "Setting wallpaper"
   if [[ "$DISTRO" == "macos" ]]; then
+    step "Setting wallpaper"
     desktoppr ~/.config/wallpaper/wallpaper.jpg
+    info "Wallpaper set"
   fi  
 }
 
