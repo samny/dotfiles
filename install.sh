@@ -48,7 +48,7 @@ link_file "$DOTFILES_DIR/opencode/config.json"  "$HOME/.config/opencode/config.j
 link_file "$DOTFILES_DIR/zed/settings.json" "$HOME/.config/zed/settings.json"
 
 # ── Wallpaper ───────────────────────────────────────────────────────────────────
-link_file "$DOTFILES_DIR/wallpaper/wallpaper.jpg" "$HOME/.config/wallpaper/wallpaper.jpg"
+link_file "$DOTFILES_DIR/wallpaper/wallpaper.jxl" "$HOME/.config/wallpaper/wallpaper.jxl"
 
 echo ""
 echo "All dotfiles linked!"
