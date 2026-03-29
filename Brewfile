@@ -9,7 +9,6 @@ brew "podman"
 brew "podman-compose"
 brew "starship"
 brew "fnm"
-brew "tailscale"
 brew "wget"
 brew "gh"
 brew "git-lfs"
@@ -30,6 +29,7 @@ cask "podman-desktop" if OS.mac?
 cask "devpod" if OS.mac?
 cask "font-fira-code-nerd-font" if OS.mac?
 cask "obsidian" if OS.mac?
+cask "tailscale-app" if OS.mac?
 
 # Mac App Store apps (uncomment and add IDs as needed)
 # mas "Xcode", id: 497799835
