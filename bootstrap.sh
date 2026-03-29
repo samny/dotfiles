@@ -191,11 +191,11 @@ setup_dotfiles() {
 configure_devpod() {
   step "Configuring DevPod providers"
 
-  devpod provider add docker --name podman \
-    -o DOCKER_PATH=podman 2>/dev/null || true
+  devpod provider add docker --force --name podman \
+    -o DOCKER_PATH=/opt/homebrew/bin/podman 2>/dev/null || true
   info "DevPod podman provider configured"
 
-  devpod provider add ssh 2>/dev/null || true
+  devpod provider add ssh --force --name devpods-remote --option HOST=developer@devpods 2>/dev/null || true
   info "DevPod SSH provider added (configure hosts manually)"
 }
 
@@ -232,6 +232,13 @@ configure_shell() {
   fi
 }
 
+set_wallpaper() {
+  step "Setting wallpaper"
+  if [[ "$DISTRO" == "macos" ]]; then
+    desktoppr ~/.config/wallpaper/wallpaper.jpg
+  fi  
+}
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -250,7 +257,8 @@ main() {
   install_homebrew
   install_packages
   configure_shell
-  # configure_devpod
+  configure_devpod
+  set_wallpaper
 
   echo ""
   step "All done! Open a new terminal to load your config."

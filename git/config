@@ -4,13 +4,9 @@
 
 [user]
 	name = Samuel Nystedt
-	email = samuel.nystedt@volvocars.com
-[core]
-    excludesfile = ~/.gitignore
+	email = samny@users.noreply.github.com
 [init]
     defaultBranch = main
-[core]
-	excludesFile = ~/.config/git/ignore
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
@@ -18,3 +14,14 @@
 	process = git-lfs filter-process
 [pull]
 	rebase = true
+
+# Work projects
+[includeIf "gitdir:~/Developer/volvo-cars/"]
+    path = config-volvo-cars
+
+# Personal projects
+[includeIf "gitdir:~/Developer/samny"]
+    path = config-samny
+
+[includeIf "gitdir:~/Developer/samny-org"]
+    path = config-samny-org

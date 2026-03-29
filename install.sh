@@ -31,24 +31,24 @@ link_file() {
 }
 
 # ── Zsh ──────────────────────────────────────────────────────────────────────
-link_file "$DOTFILES_DIR/zsh/.zshrc"       "$HOME/.config/zsh/.zshrc"
-link_file "$DOTFILES_DIR/zsh/.zshenv"      "$HOME/.zshenv"
+link_file "$DOTFILES_DIR/zsh/zshrc"       "$HOME/.config/zsh/.zshrc"
+link_file "$DOTFILES_DIR/zsh/zshenv"      "$HOME/.zshenv"
 
 # ── Starship ─────────────────────────────────────────────────────────────────
 link_file "$DOTFILES_DIR/starship/starship.toml"  "$HOME/.config/starship.toml"
 
 # ── Git ──────────────────────────────────────────────────────────────────────
-link_file "$DOTFILES_DIR/git/.gitconfig"   "$HOME/.gitconfig"
-link_file "$DOTFILES_DIR/git/.gitignore"   "$HOME/.gitignore"
+link_file "$DOTFILES_DIR/git/config"   "$HOME/.config/git/config"
+link_file "$DOTFILES_DIR/git/ignore"   "$HOME/.config/git/ignore"
 
 # ── OpenCode ─────────────────────────────────────────────────────────────────
 link_file "$DOTFILES_DIR/opencode/config.json"  "$HOME/.config/opencode/config.json"
 
-# ── DevPod ───────────────────────────────────────────────────────────────────
-link_file "$DOTFILES_DIR/devpod/config.yaml" "$HOME/.devpod/config.yaml"
-
 # ── Zed ───────────────────────────────────────────────────────────────────
 link_file "$DOTFILES_DIR/zed/settings.json" "$HOME/.config/zed/settings.json"
+
+# ── Wallpaper ───────────────────────────────────────────────────────────────────
+link_file "$DOTFILES_DIR/wallpaper/wallpaper.jpg" "$HOME/.config/wallpaper/wallpaper.jpg"
 
 echo ""
 echo "All dotfiles linked!"
