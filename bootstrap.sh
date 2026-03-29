@@ -83,7 +83,6 @@ configure_desktop() {
 
 
     killall Finder 2>/dev/null || true
-    killall cfprefsd 2>/dev/null || true
     killall Dock 2>/dev/null || true
     killall SystemUIServer 2>/dev/null || true
 
@@ -201,7 +200,7 @@ configure_devpod() {
   info "DevPod podman provider configured"
 
   devpod provider add ssh --force --name devpods-remote --option HOST=developer@devpods 2>/dev/null || true
-  info "DevPod SSH provider added (configure hosts manually)"
+  info "DevPod SSH provider added for host devpods"
 }
 
 # ---------------------------------------------------------------------------
