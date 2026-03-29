@@ -17,9 +17,9 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 brew "opencode"
 brew "copilot"
-brew "desktoppr" if OS.mac?
 
 # GUI apps
+brew "desktoppr" if OS.mac?
 cask "ghostty" if OS.mac?
 cask "github" if OS.mac?
 cask "1password" if OS.mac?
