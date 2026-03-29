@@ -239,7 +239,7 @@ configure_shell() {
 set_wallpaper() {
   if [[ "$DISTRO" == "macos" ]]; then
     step "Setting wallpaper"
-    desktoppr ~/.config/wallpaper/wallpaper.jpg
+    desktoppr ~/.config/wallpaper/wallpaper.jxl
     info "Wallpaper set"
   fi  
 }

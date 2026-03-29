@@ -121,5 +121,6 @@ work_on() {
 }
 
 alias docker=podman
-export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
-export PATH="/opt/homebrew/opt/gradle@8/bin:$PATH"
+alias code=codium
+#export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+#export PATH="/opt/homebrew/opt/gradle@8/bin:$PATH"
