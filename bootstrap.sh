@@ -270,6 +270,11 @@ main() {
   echo "  Remaining manual steps:"
   if [[ "$DISTRO" == "macos" ]]; then
     echo "  • Sign in to 1Password"
+    echo "  • Install 1Password for Safari"
+    echo "  • Allow 1Password to control the computer in System Settings / Privacy & Security / Accessibility"
+    echo "  • Disable autofill Passwords in System Settings / General / AutoFill & Passwords and in Safari Settings / Autofill"
+    echo "  • Set DuckDuckGo as search engine"
+    echo "  • Enable Zoom in System Settings / Accessibility / Zoom"
   else
     echo "  • Install GUI apps manually (1Password, VS Codium, Zed, etc.)"
   fi
