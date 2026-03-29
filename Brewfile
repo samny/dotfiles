@@ -19,7 +19,7 @@ brew "opencode"
 brew "copilot"
 
 # GUI apps
-brew "desktoppr" if OS.mac?
+cask "desktoppr" if OS.mac?
 cask "ghostty" if OS.mac?
 cask "github" if OS.mac?
 cask "1password" if OS.mac?
