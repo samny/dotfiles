@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # =============================================================================
@@ -9,7 +9,7 @@ set -euo pipefail
 # =============================================================================
 
 DOTFILES_REPO="https://github.com/samny/dotfiles.git"
-DOTFILES_DIR="$HOME/dotfiles"
+DOTFILES_DIR="${HOME}/dotfiles"
 
 # Colors
 RED='\033[0;31m'
@@ -22,6 +22,54 @@ warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
 error() { echo -e "${RED}[✗]${NC} $1"; }
 step()  { echo -e "\n${GREEN}==>${NC} $1\n"; }
 
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# ---------------------------------------------------------------------------
+# Safety: must NOT run as root
+# ---------------------------------------------------------------------------
+require_non_root() {
+  if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+    error "Do not run this script as root."
+    echo "Run it as your normal user; it will use sudo for the steps that need it."
+    echo "Example: ./bootstrap.sh"
+    exit 1
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Sudo management (best-effort keepalive)
+# ---------------------------------------------------------------------------
+SUDO_PID=""
+
+sudo_init() {
+  # If sudo isn't available (rare on macOS), just continue and let commands fail naturally.
+  if ! have sudo; then
+    warn "sudo not found; privileged steps may fail."
+    return 0
+  fi
+
+  # Ask for password early so later steps don't fail mid-stream
+  step "Requesting sudo permissions"
+  sudo -v
+
+  # Keep sudo alive until script exits
+  (
+    while true; do
+      sleep 60
+      sudo -n true 2>/dev/null || exit 0
+    done
+  ) &
+  SUDO_PID="$!"
+  info "sudo session active"
+}
+
+sudo_cleanup() {
+  if [[ -n "${SUDO_PID}" ]]; then
+    kill "${SUDO_PID}" 2>/dev/null || true
+  fi
+}
+trap sudo_cleanup EXIT
+
 # ---------------------------------------------------------------------------
 # Detect OS and distro
 # ---------------------------------------------------------------------------
@@ -32,8 +80,9 @@ detect_distro() {
   if [[ "$OS" == "Darwin" ]]; then
     DISTRO="macos"
   elif [[ -f /etc/os-release ]]; then
+    # shellcheck disable=SC1091
     . /etc/os-release
-    case "$ID" in
+    case "${ID:-}" in
       debian|ubuntu|pop|linuxmint) DISTRO="debian" ;;
       fedora|rhel|centos|rocky|alma) DISTRO="fedora" ;;
       *)
@@ -42,7 +91,7 @@ detect_distro() {
         elif [[ "${ID_LIKE:-}" == *"fedora"* || "${ID_LIKE:-}" == *"rhel"* ]]; then
           DISTRO="fedora"
         else
-          error "Unsupported distro: $ID"
+          error "Unsupported distro: ${ID:-unknown}"
           exit 1
         fi
         ;;
@@ -62,32 +111,40 @@ configure_desktop() {
   step "Configuring desktop defaults"
 
   if [[ "$DISTRO" == "macos" ]]; then
+    if ! have defaults; then
+      warn "defaults command not found; skipping macOS defaults"
+      return 0
+    fi
+
     # Finder: always use list view
-    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-    defaults write com.apple.finder ShowPathbar -bool true
-    defaults write com.apple.finder ShowStatusBar -bool true
-    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv" || true
+    defaults write com.apple.finder ShowPathbar -bool true || true
+    defaults write com.apple.finder ShowStatusBar -bool true || true
+    defaults write NSGlobalDomain AppleShowAllExtensions -bool true || true
 
     # Screen capture location
-    mkdir -p ~/Downloads/Screenshots
-    defaults write com.apple.screencapture location ~/Downloads/Screenshots
+    mkdir -p "${HOME}/Downloads/Screenshots"
+    defaults write com.apple.screencapture location "${HOME}/Downloads/Screenshots" || true
 
     # Dock: clear all apps, hide recents
-    defaults write com.apple.dock persistent-apps -array
-    defaults write com.apple.dock show-recents -bool false
-    defaults write com.apple.dock tilesize -int 36
+    defaults write com.apple.dock persistent-apps -array || true
+    defaults write com.apple.dock show-recents -bool false || true
+    defaults write com.apple.dock tilesize -int 36 || true
 
-    # Disable Passwords app from AutoFill
-    # TODO: This doesn't seem to work completely, is still get recommendation to save passwords in Safari
-    defaults write com.apple.WebUI AutoFillPasswords -bool false
-    defaults write com.apple.Passwords autofillEnabled -bool false
-    pluginkit -e ignore -i com.apple.Passwords
+    # Disable Passwords app from AutoFill (may vary by macOS version; don't fail hard)
+    defaults write com.apple.WebUI AutoFillPasswords -bool false || true
+    defaults write com.apple.Passwords autofillEnabled -bool false || true
+    if have pluginkit; then
+      pluginkit -e ignore -i com.apple.Passwords || true
+    else
+      warn "pluginkit not found; skipping Passwords plugin tweak"
+    fi
 
     killall Finder 2>/dev/null || true
     killall Dock 2>/dev/null || true
     killall SystemUIServer 2>/dev/null || true
 
-  elif command -v gsettings &>/dev/null; then
+  elif have gsettings; then
     # GNOME: Nautilus always list view
     gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view' 2>/dev/null || true
 
@@ -101,7 +158,7 @@ configure_desktop() {
 
   else
     warn "No supported desktop environment detected, skipping"
-    return
+    return 0
   fi
 
   info "Desktop defaults applied"
@@ -115,18 +172,20 @@ install_prerequisites() {
 
   case "$DISTRO" in
     macos)
-      if xcode-select -p &>/dev/null; then
+      if have xcode-select && xcode-select -p &>/dev/null; then
         info "Xcode CLI tools already installed"
       else
-        xcode-select --install 2>/dev/null || true
+        if have xcode-select; then
+          xcode-select --install 2>/dev/null || true
+        fi
         echo "Waiting for Xcode CLI tools to finish installing..."
         local timeout=1800  # 30 minutes
         local elapsed=0
-        until xcode-select -p &>/dev/null; do
+        until (have xcode-select && xcode-select -p &>/dev/null); do
           sleep 5
           elapsed=$((elapsed + 5))
-          if [ "$elapsed" -ge "$timeout" ]; then
-            echo "Timed out waiting for Xcode CLI tools. Please install manually and rerun."
+          if [[ "$elapsed" -ge "$timeout" ]]; then
+            error "Timed out waiting for Xcode CLI tools. Please install manually and rerun."
             exit 1
           fi
         done
@@ -149,20 +208,31 @@ install_prerequisites() {
 # ---------------------------------------------------------------------------
 # 3. Homebrew (works on both macOS and Linux)
 # ---------------------------------------------------------------------------
+ensure_brew_in_path() {
+  # Add brew to current session PATH if present (both macOS and Linuxbrew)
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  fi
+}
+
 install_homebrew() {
   step "Installing Homebrew"
 
-  if command -v brew &>/dev/null; then
+  ensure_brew_in_path
+
+  if have brew; then
     info "Homebrew already installed"
   else
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    ensure_brew_in_path
+  fi
 
-    # Add brew to current session PATH
-    if [[ "$DISTRO" == "macos" && -f /opt/homebrew/bin/brew ]]; then
-      eval "$(/opt/homebrew/bin/brew shellenv)"
-    elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
-      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    fi
+  if ! have brew; then
+    error "Homebrew installation did not result in a usable 'brew' in PATH."
+    echo "Try opening a new shell, or ensure brew is installed at /opt/homebrew (macOS) or /home/linuxbrew/.linuxbrew."
+    exit 1
   fi
 
   brew update
@@ -175,10 +245,14 @@ install_homebrew() {
 install_packages() {
   step "Installing packages via Brewfile"
 
-  local brewfile="$DOTFILES_DIR/Brewfile"
+  local brewfile="${DOTFILES_DIR}/Brewfile"
+
+  if [[ ! -f "$brewfile" ]]; then
+    warn "No Brewfile found at ${brewfile}; skipping brew bundle"
+    return 0
+  fi
 
   brew bundle --file="$brewfile"
-
   info "All packages installed"
 }
 
@@ -188,14 +262,21 @@ install_packages() {
 setup_dotfiles() {
   step "Setting up dotfiles"
 
-  if [[ -d "$DOTFILES_DIR" ]]; then
+  if [[ -d "$DOTFILES_DIR/.git" ]]; then
     info "Dotfiles directory already exists, pulling latest"
     git -C "$DOTFILES_DIR" pull
+  elif [[ -d "$DOTFILES_DIR" ]]; then
+    warn "Dotfiles dir exists but isn't a git repo: ${DOTFILES_DIR}"
+    warn "Skipping clone; running install.sh if present"
   else
     git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
   fi
 
-  "$DOTFILES_DIR/install.sh"
+  if [[ -x "$DOTFILES_DIR/install.sh" ]]; then
+    "$DOTFILES_DIR/install.sh"
+  else
+    warn "install.sh not found or not executable at ${DOTFILES_DIR}/install.sh"
+  fi
 
   info "Dotfiles linked"
 }
@@ -205,6 +286,11 @@ setup_dotfiles() {
 # ---------------------------------------------------------------------------
 configure_devpod() {
   step "Configuring DevPod providers"
+
+  if ! have devpod; then
+    warn "devpod not installed; skipping provider configuration"
+    return 0
+  fi
 
   devpod provider add docker --force --name podman \
     -o DOCKER_PATH=/opt/homebrew/bin/podman 2>/dev/null || true
@@ -220,39 +306,85 @@ configure_devpod() {
 configure_shell() {
   step "Configuring shell"
 
-  local target_zsh
-  target_zsh="$(brew --prefix)/bin/zsh"
-
-  # Add brew zsh to allowed shells if needed
-  if ! grep -qF "$target_zsh" /etc/shells; then
-    echo "$target_zsh" | sudo tee -a /etc/shells
+  if ! have brew; then
+    warn "brew not found; cannot configure Homebrew zsh"
+    return 0
   fi
 
-  if [[ "$SHELL" != "$target_zsh" ]]; then
-    chsh -s "$target_zsh"
-    info "Default shell changed to Homebrew zsh"
+  local brew_prefix target_zsh user_name
+  brew_prefix="$(brew --prefix)"
+  target_zsh="${brew_prefix}/bin/zsh"
+  user_name="${SUDO_USER:-${USER:-}}"
+
+  if [[ -z "$user_name" ]]; then
+    user_name="$(id -un)"
+  fi
+
+  if [[ ! -x "$target_zsh" ]]; then
+    warn "Homebrew zsh not found at ${target_zsh}; skipping shell change"
+    return 0
+  fi
+
+  # Add brew zsh to allowed shells if needed
+  if [[ -r /etc/shells ]] && ! grep -qF "$target_zsh" /etc/shells; then
+    echo "$target_zsh" | sudo tee -a /etc/shells >/dev/null
+    info "Added ${target_zsh} to /etc/shells"
+  fi
+
+  # Change shell for the invoking user explicitly
+  local current_shell
+  current_shell="$(getent passwd "$user_name" 2>/dev/null | cut -d: -f7 || true)"
+  if [[ -z "$current_shell" ]]; then
+    # macOS fallback
+    current_shell="$(dscl . -read "/Users/${user_name}" UserShell 2>/dev/null | awk '{print $2}' || true)"
+  fi
+
+  if [[ "$SHELL" != "$target_zsh" && "$current_shell" != "$target_zsh" ]]; then
+    if chsh -s "$target_zsh" "$user_name" 2>/dev/null; then
+      info "Default shell changed to Homebrew zsh for ${user_name}"
+    else
+      warn "Failed to change shell automatically. You may need to run:"
+      echo "  chsh -s \"${target_zsh}\" \"${user_name}\""
+    fi
   else
     info "Homebrew zsh already default"
   fi
 
   # Podman machine is macOS-only — Linux runs podman natively
   if [[ "$DISTRO" == "macos" ]]; then
-    if ! podman machine info &>/dev/null; then
-      podman machine init
-      podman machine start
-      info "Podman machine initialized and started"
+    if have podman; then
+      if ! podman machine info &>/dev/null; then
+        podman machine init || true
+        podman machine start || true
+        info "Podman machine initialized and started"
+      else
+        info "Podman machine already exists"
+      fi
     else
-      info "Podman machine already exists"
+      warn "podman not installed; skipping podman machine setup"
     fi
   fi
 }
 
 set_wallpaper() {
-  if [[ "$DISTRO" == "macos" ]]; then
-    step "Setting wallpaper"
-    desktoppr ~/.config/wallpaper/wallpaper.jxl
-    info "Wallpaper set"
+  if [[ "$DISTRO" != "macos" ]]; then
+    return 0
   fi
+
+  step "Setting wallpaper"
+
+  local wallpaper="${HOME}/.config/wallpaper/wallpaper.jxl"
+  if ! have desktoppr; then
+    warn "desktoppr not installed; skipping wallpaper"
+    return 0
+  fi
+  if [[ ! -f "$wallpaper" ]]; then
+    warn "Wallpaper file not found at ${wallpaper}; skipping"
+    return 0
+  fi
+
+  desktoppr "$wallpaper" || true
+  info "Wallpaper set"
 }
 
 # ---------------------------------------------------------------------------
@@ -265,13 +397,20 @@ main() {
   echo "╚══════════════════════════════════════╝"
   echo ""
 
+  require_non_root
   detect_distro
+  sudo_init
 
   configure_desktop
   install_prerequisites
-  setup_dotfiles
+
+  # Ensure brew exists before running anything that might depend on it
   install_homebrew
+
+  # Install Brewfile packages before running dotfiles install (often depends on brew tools)
+  setup_dotfiles
   install_packages
+
   configure_shell
   configure_devpod
   set_wallpaper
