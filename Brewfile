@@ -30,6 +30,11 @@ cask "devpod" if OS.mac?
 cask "font-fira-code-nerd-font" if OS.mac?
 cask "obsidian" if OS.mac?
 cask "tailscale-app" if OS.mac?
+cask "ungoogled-chromium" if OS.mac?
+cask "firefox@developer-edition" if OS.mac?
+cask "utm" if OS.mac?
 
-# Mac App Store apps (uncomment and add IDs as needed)
-# mas "Xcode", id: 497799835
+# Mac App Store apps
+mas "1Password for Safari", id: 1569813296
+mas "uBlock Origin Lite", id: 6745342698
+mas "Consent-O-Matic", id: 1606897889

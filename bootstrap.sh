@@ -78,9 +78,10 @@ configure_desktop() {
     defaults write com.apple.dock tilesize -int 36
 
     # Disable Passwords app from AutoFill
+    # TODO: This doesn't seem to work completely, is still get recommendation to save passwords in Safari
     defaults write com.apple.WebUI AutoFillPasswords -bool false
     defaults write com.apple.Passwords autofillEnabled -bool false
-
+    pluginkit -e ignore -i com.apple.Passwords
 
     killall Finder 2>/dev/null || true
     killall Dock 2>/dev/null || true
@@ -117,9 +118,19 @@ install_prerequisites() {
       if xcode-select -p &>/dev/null; then
         info "Xcode CLI tools already installed"
       else
-        xcode-select --install
-        echo "Press any key when the Xcode CLI installation is complete..."
-        read -n 1 -s
+        xcode-select --install 2>/dev/null || true
+        echo "Waiting for Xcode CLI tools to finish installing..."
+        local timeout=1800  # 30 minutes
+        local elapsed=0
+        until xcode-select -p &>/dev/null; do
+          sleep 5
+          elapsed=$((elapsed + 5))
+          if [ "$elapsed" -ge "$timeout" ]; then
+            echo "Timed out waiting for Xcode CLI tools. Please install manually and rerun."
+            exit 1
+          fi
+        done
+        info "Xcode CLI tools installed."
       fi
       ;;
     debian)
@@ -241,7 +252,7 @@ set_wallpaper() {
     step "Setting wallpaper"
     desktoppr ~/.config/wallpaper/wallpaper.jxl
     info "Wallpaper set"
-  fi  
+  fi
 }
 
 # ---------------------------------------------------------------------------
